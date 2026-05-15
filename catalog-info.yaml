@@ -1,12 +1,27 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: card-limit-api 
+  name: card-limit-api
   description: API para gestão de limites / Motor de fraude
-  annotations:
-    backstage.io/api-docs-ref: file: ./openapi.yaml
 spec:
   type: service
   lifecycle: production
   owner: group:cartoes-credito
+  domain: financeiro
   system: system:card-services
+  providesApis:
+    - card-limit-api
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: card-limit-api
+  description: "Especificação OpenAPI do Card Limit API"
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:cartoes-credito
+  system: system:card-services
+  definition:
+    $text: ./openapi.yaml
