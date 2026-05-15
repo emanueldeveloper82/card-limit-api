@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: Card Limit API
+  description: API para gestão de limites de cartões de crédito
+  version: 1.0.0
+  contact:
+    name: Equipe Cartões de Crédito
+    email: cartoes-credito@zetra-bank.com
+
+servers:
+  - url: https://api.zetra-bank.com/card-limits
+    description: Production
+
+paths:
+  /limits/{cardId}:
+    get:
+      summary: Consultar limite disponível do cartão
+      operationId: getCardLimit
+      tags:
+        - Limits
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Limite do cartão
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cardId:
+                    type: string
+                  totalLimit:
+                    type: number
+                  availableLimit:
+                    type: number
+                  usedLimit:
+                    type: number
+                  lastUpdate:
+                    type: string
+                    format: date-time
+
+    put:
+      summary: Atualizar limite do cartão
+      operationId: updateCardLimit
+      tags:
+        - Limits
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newLimit:
+                  type: number
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Limite atualizado com sucesso
+
+  /limits/{cardId}/increase-request:
+    post:
+      summary: Solicitar aumento de limite
+      operationId: requestLimitIncrease
+      tags:
+        - Limits
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requestedLimit:
+                  type: number
+                reason:
+                  type: string
+      responses:
+        '201':
+          description: Solicitação criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  status:
+                    type: string
+                    enum: [PENDING, APPROVED, REJECTED]
+
+  /limits/{cardId}/history:
+    get:
+      summary: Consultar histórico de limites
+      operationId: getLimitHistory
+      tags:
+        - Limits
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: months
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        '200':
+          description: Histórico de limites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    limit:
+                      type: number
+                    reason:
+                      type: string
